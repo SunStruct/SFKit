@@ -1,5 +1,5 @@
 object Versions {
-    const val kotlin = "1.4.30"
+    const val kotlin = "1.4.32"
 
     // Android settings
     const val minSdkVersion = 21

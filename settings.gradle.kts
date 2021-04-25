@@ -1,15 +1,12 @@
 pluginManagement {
     repositories {
         google()
-        jcenter()
         gradlePluginPortal()
         mavenCentral()
     }
-    
 }
-rootProject.name = "SFKit"
 
+rootProject.name = "SFKit"
 
 include(":androidApp")
 include(":shared")
-

@@ -5,6 +5,19 @@ plugins {
     id("com.android.library")
 }
 
+// TODO remove after upgrade to Kotlin 1.5
+// workaround for bug in KMM plugin after update to Android Gradle Plugin 7.0
+android {
+    configurations {
+        create("androidTestApi")
+        create("androidTestDebugApi")
+        create("androidTestReleaseApi")
+        create("testApi")
+        create("testDebugApi")
+        create("testReleaseApi")
+    }
+}
+
 kotlin {
     android()
     ios {
