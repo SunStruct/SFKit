@@ -18,20 +18,11 @@
  * along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-object Versions {
-    const val kotlin = "1.4.32"
+package com.sfkit.androidApp.ui.theme
 
-    // Android settings
-    const val minSdkVersion = 21
-    const val targetSdkVersion = 30
+import androidx.compose.ui.graphics.Color
 
-    // Android dependencies
-    const val activity = "1.3.0-alpha06"
-    const val appCompat = "1.2.0"
-    const val compose = "1.0.0-beta04"
-    const val core = "1.6.0-alpha02"
-    const val material = "1.3.0"
-
-    // Android test dependencies
-    const val junit = "4.13"
-}
+val Purple200 = Color(0xFFBB86FC)
+val Purple500 = Color(0xFF6200EE)
+val Purple700 = Color(0xFF3700B3)
+val Teal200 = Color(0xFF03DAC5)

@@ -36,9 +36,9 @@ kotlin {
             }
         }
         val androidMain by getting {
-            dependencies {
+            /*dependencies {
                 implementation("com.google.android.material:material:${Versions.material}")
-            }
+            }*/
         }
         val androidTest by getting {
             dependencies {
