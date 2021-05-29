@@ -22,43 +22,94 @@ package com.sfkit.androidApp
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.UiMode
+import com.sfkit.androidApp.ui.CharactersList
+import com.sfkit.androidApp.ui.SelectedCharacter
 import com.sfkit.androidApp.ui.theme.SFKitTheme
-import com.sfkit.shared.Greeting
-
-fun greet(): String = Greeting().greeting()
+import com.sfkit.shared.*
+import com.sfkit.shared.structs.Character
+import org.reduxkotlin.StoreSubscription
 
 class MainActivity : ComponentActivity() {
+    // TODO replace with DI
+    private val entryPoint = EntryPoint()
+    private lateinit var unsubscribe: StoreSubscription
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SFKitTheme {
-                Scaffold {
-                    Content()
-                }
+            var state by mutableStateOf(entryPoint.state)
+            unsubscribe = entryPoint.store.subscribe {
+                val newState = entryPoint.store.state
+                state = newState
+                Log.v(TAG, newState.toString())
+            }
+            MainLayout(
+                state,
+                createNewCharacter = { entryPoint.store.dispatch(CreateNewCharacter()) },
+                characterSelected = { id -> entryPoint.store.dispatch(SelectCharacter(id)) },
+                backToListNavigation = ::backToListNavigation
+            )
+        }
+
+        onBackPressedDispatcher.addCallback(onBackPressedCallback)
+    }
+
+    override fun onDestroy() {
+        if (::unsubscribe.isInitialized) {
+            unsubscribe()
+        }
+        super.onDestroy()
+    }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            when (entryPoint.state.currentCharacter) {
+                is CurrentCharacter.NoSelection -> finish()
+                is CurrentCharacter.SelectedCharacter -> backToListNavigation()
+                else -> {}
             }
         }
     }
+
+    private fun backToListNavigation() {
+        entryPoint.store.dispatch(SelectCharacter(null))
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
+    }
 }
 
+// TODO add character removing ?
+// TODO start implementing character creation
 @Composable
-private fun Content() {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Text(
-            text = greet(),
-            modifier = Modifier.wrapContentSize(Alignment.Center)
-        )
+private fun MainLayout(
+    state: CommonState,
+    createNewCharacter: () -> Unit,
+    characterSelected: (id: String) -> Unit,
+    backToListNavigation: () -> Unit
+) {
+    SFKitTheme {
+        // TODO replace with explode animation
+        Crossfade(targetState = state.currentCharacter) { currentCharacter ->
+            when {
+                currentCharacter === CurrentCharacter.NoSelection ->
+                    CharactersList(state, createNewCharacter, characterSelected)
+                currentCharacter is CurrentCharacter.SelectedCharacter ->
+                    SelectedCharacter(state, currentCharacter, backToListNavigation)
+            }
+        }
     }
 }
 
@@ -69,8 +120,11 @@ private fun Content() {
     showSystemUi = true,
 )
 @Composable
-fun ContentPreview() {
-    SFKitTheme {
-        Content()
-    }
+fun MainLayoutPreview() {
+    MainLayout(
+        state = CommonState(characters = mapOf("0" to Character("0"))),
+        createNewCharacter = {},
+        characterSelected = {},
+        backToListNavigation = {}
+    )
 }

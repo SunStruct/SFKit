@@ -20,4 +20,7 @@
   -->
 <resources>
     <string name="app_name">SFKit</string>
+
+    <string name="unknown_character">Unnamed character</string>
+    <string name="error_unknown_character">Error. Cannot find selected character %s.</string>
 </resources>
